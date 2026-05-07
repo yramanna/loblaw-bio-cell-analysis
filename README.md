@@ -1,18 +1,46 @@
 # Loblaw Bio Immune Cell Analysis
 
-This repo contains a Python analysis pipeline and dashboard for immune cell population data from a clinical trial:
+This project analyzes immune cell counts from `cell-count.csv`, stores the data in SQLite, generates the required analysis outputs, and provides a Streamlit dashboard.
 
-1. Load `cell-count.csv` into a SQLite database.
-2. Calculate relative immune cell population frequencies per sample.
-3. Compare melanoma PBMC miraclib responders and non-responders.
-4. Generate summary outputs and plots.
-5. Provide an interactive dashboard.
-
-## Running the project
+## Run in GitHub Codespaces
 
 Install dependencies:
 
-```bash
-make setup
+    make setup
 
-```
+Run the full pipeline:
+
+    make pipeline
+
+This creates `cell_counts.db` and writes output tables/plots to `outputs/`.
+
+Start the dashboard:
+
+    make dashboard
+
+Dashboard link:
+
+    http://localhost:8501
+
+## Database schema
+
+The SQLite database has four tables:
+
+- `projects(project_id)`
+- `patients(patient_id, indication, age, treatment, response, gender)`
+- `samples(sample_id, patient_id, project_id, sample_type, time_from_treatment_start)`
+- `cell_counts(sample_id, population, count)`
+
+The input CSV uses `subject`, `condition`, `sex`, and `sample`. These are loaded as `patient_id`, `indication`, `gender`, and `sample_id`.
+
+This schema separates project, patient, sample, and cell-count information. It avoids repeating metadata for every cell population and supports multiple samples per subject. It also scales well to hundreds of projects and thousands of samples because new samples and cell populations can be added as rows without changing the table structure.
+
+## Code structure
+
+- `load_data.py`: creates the SQLite database and loads `cell-count.csv`
+- `analysis.py`: calculates relative frequencies, runs statistical analysis, and generates output files
+- `dashboard.py`: Streamlit dashboard for exploring results
+- `Makefile`: provides `setup`, `pipeline`, and `dashboard` commands
+- `requirements.txt`: Python dependencies
+
+The code is split this way so loading, analysis, and visualization can be run independently while still using the same SQLite database.

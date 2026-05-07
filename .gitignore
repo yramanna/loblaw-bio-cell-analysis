@@ -4,8 +4,4 @@ __pycache__/
 venv/
 .env
 
-*.db
-outputs/*
-!outputs/.gitkeep
-
 .DS_Store
